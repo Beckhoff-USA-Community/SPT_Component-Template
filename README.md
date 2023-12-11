@@ -1,0 +1,1 @@
+# SPT_Component-Template
