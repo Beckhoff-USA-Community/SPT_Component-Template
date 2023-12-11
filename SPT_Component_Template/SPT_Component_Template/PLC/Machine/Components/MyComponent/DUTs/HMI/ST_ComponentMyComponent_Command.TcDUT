@@ -3,8 +3,7 @@
   <DUT Name="ST_ComponentMyComponent_Command" Id="{a1dca97a-b9e1-4566-9faf-78a08d661af4}">
     <Declaration><![CDATA[TYPE ST_ComponentMyComponent_Command :
 	STRUCT
-		Extend	: BOOL;
-		Retract : BOOL;
+		MyCommand1 : BOOL;
 	END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

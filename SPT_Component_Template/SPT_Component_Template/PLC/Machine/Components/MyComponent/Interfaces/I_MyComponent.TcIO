@@ -3,15 +3,6 @@
   <Itf Name="I_MyComponent" Id="{5d1c1a42-5124-4f65-bcb2-9a123c8b6a66}">
     <Declaration><![CDATA[INTERFACE I_MyComponent EXTENDS I_BaseFB
 ]]></Declaration>
-    <Property Name="FeedbackVar" Id="{1b8ff169-d8a6-4145-bd7c-2bd852f52601}">
-      <Declaration><![CDATA[PROPERTY FeedbackVar : BOOL]]></Declaration>
-      <Get Name="Get" Id="{19c74b8b-da83-45d1-8725-b19e9d9b7f1a}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-      <Set Name="Set" Id="{cb29e313-ebb3-44c6-ac8b-e47b1a7820ba}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Set>
-    </Property>
     <Method Name="MyCommand1" Id="{8d94ca5c-baad-4cb7-812f-85deca376178}">
       <Declaration><![CDATA[METHOD MyCommand1 : BOOL
 VAR_INPUT
@@ -24,5 +15,23 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
+    <Property Name="MyVarProperty1" Id="{1b8ff169-d8a6-4145-bd7c-2bd852f52601}">
+      <Declaration><![CDATA[PROPERTY MyVarProperty1 : BOOL]]></Declaration>
+      <Get Name="Get" Id="{19c74b8b-da83-45d1-8725-b19e9d9b7f1a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{cb29e313-ebb3-44c6-ac8b-e47b1a7820ba}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="MyVarProperty2" Id="{9a73445c-ad2b-4470-ae8c-75390a91f31e}">
+      <Declaration><![CDATA[PROPERTY MyVarProperty2 : BOOL]]></Declaration>
+      <Get Name="Get" Id="{54223792-0e3c-437e-9767-22dbfc43fcc6}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{9120bf1c-51b8-448d-98b0-9ae2785cf199}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
   </Itf>
 </TcPlcObject>

@@ -3,9 +3,9 @@
   <DUT Name="ST_ComponentMyComponent_HMI" Id="{49a10774-9eb0-4466-a018-5a90651cee06}">
     <Declaration><![CDATA[TYPE ST_ComponentMyComponent_HMI :
 	STRUCT
-		Config	: ST_ComponentMyComponent_Config;
-		Command : ST_ComponentMyComponent_Command;
-		Status	: ST_ComponentMyComponent_Status;
+		Config	: ST_ComponentMyComponent_Config;  // Settings e.g. Timeout, IP Address,...
+		Command : ST_ComponentMyComponent_Command; // Command to be execute from HMI e.g. extend, retract,...
+		Status	: ST_ComponentMyComponent_Status;  // Feedback from Component to HMI e.g. extended, retracted,...
 	END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

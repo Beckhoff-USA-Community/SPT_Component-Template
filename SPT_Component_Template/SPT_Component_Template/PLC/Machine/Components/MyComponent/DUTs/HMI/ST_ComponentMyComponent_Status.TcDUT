@@ -3,10 +3,7 @@
   <DUT Name="ST_ComponentMyComponent_Status" Id="{4b8bc812-77af-4661-a312-32bb504738b3}">
     <Declaration><![CDATA[TYPE ST_ComponentMyComponent_Status :
 	STRUCT
-		Extend		   : BOOL;
-		Retract		   : BOOL;
-		InhibitExtend  : BOOL;
-		InhibitRetract : BOOL;
+		MyVarProperty1 : BOOL;
 	END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

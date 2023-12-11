@@ -94,26 +94,19 @@ SUPER^.CyclicLogic();
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := MyComponentAlarms, CurrentSeverity := _CurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
-    <Property Name="FeedbackVar" Id="{8addcbe5-2771-45cd-afcd-b98ddd47720b}" FolderPath="I_MyComponent\">
-      <Declaration><![CDATA[PROPERTY FeedbackVar : BOOL
-]]></Declaration>
-      <Get Name="Get" Id="{fec35cb3-5baf-4ad2-8990-0eff9ebd84ba}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{914bb045-2129-4b16-8154-ab2de1c040bc}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
+    <Method Name="HMICommunication" Id="{16b5013b-d7e2-4d9a-ab1e-a750ae2342e6}" FolderPath="Methods\">
+      <Declaration><![CDATA[//! @summary Provides interlocks for HMI control and updates HMI status information for this component
+METHOD PROTECTED HMICommunication
+
+//! @description This method is called cyclically by <c>CyclicLogic()</c>]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.HMICommunication();
+
+// Command
+
+// Status]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Initialize" Id="{03fd09bd-1582-4c66-9b79-0b5b3087bf7b}" FolderPath="Methods\">
       <Declaration><![CDATA[//! @summary Basic component initialization logic
 METHOD PROTECTED Initialize : BOOL;
@@ -139,7 +132,7 @@ METHOD PROTECTED Monitoring
 (*! @descriptionThis method is called cyclically by <c>CyclicLogic()</c>*)]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.Monitoring();
-{error 'Programming instruction - raise custom alarms here'}
+{error 'Programming instruction - Raise custom alarms here'}
 IF TRUE AND NOT MyComponentAlarms[E_MyComponentAlarms.MyExampleError].bRaised THEN
 	RaiseAlarmWithStrings(MyComponentAlarms[E_MyComponentAlarms.MyExampleError], '', '');
 END_IF]]></ST>
@@ -174,6 +167,45 @@ MyCommand1 := TRUE;]]></ST>
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
+    <Property Name="MyVarProperty1" Id="{8addcbe5-2771-45cd-afcd-b98ddd47720b}" FolderPath="I_MyComponent\">
+      <Declaration><![CDATA[PROPERTY MyVarProperty1 : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{fec35cb3-5baf-4ad2-8990-0eff9ebd84ba}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MyVarProperty1 := _MyVarProperty1;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{914bb045-2129-4b16-8154-ab2de1c040bc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_MyVarProperty1 := MyVarProperty1;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="MyVarProperty2" Id="{875ee0f8-d3f8-4a69-a087-448cd7ca4734}" FolderPath="I_MyComponent\">
+      <Declaration><![CDATA[PROPERTY MyVarProperty2 : BOOL]]></Declaration>
+      <Get Name="Get" Id="{3842b905-26dd-4a6e-bd95-bade362be1a7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MyVarProperty2 := _MyVarProperty2;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{45c1d1cd-1b65-4c46-8411-d159cae69c21}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_MyVarProperty2 := MyVarProperty2;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Reset" Id="{e57ca05e-1d1b-4272-a623-f51b9e9bbea5}" FolderPath="I_ComponentBase\">
       <Declaration><![CDATA[//! @summary Clears error flags and error IDs for this component
 METHOD PUBLIC Reset : BOOL]]></Declaration>
