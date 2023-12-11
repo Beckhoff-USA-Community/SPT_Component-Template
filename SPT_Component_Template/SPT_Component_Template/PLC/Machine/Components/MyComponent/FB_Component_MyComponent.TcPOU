@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Component_MyComponent" Id="{c4b9680e-4743-49b4-a2c7-50b7d660fa2f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Component_MyComponent EXTENDS FB_ComponentBase IMPLEMENTS I_MyComponent
+VAR
+	{error 'Programming instruction - Remove example variables'}
+
+	// Inputs
+	MyInput AT %I* : BOOL;
+
+	// Outputs
+	MyOutput AT %Q* : BOOL;
+
+	// HMI
+	MyComponent_HMI : ST_ComponentMyComponent_HMI;
+
+	// Alarms
+	MyComponentAlarms : ARRAY[1..MY_COMPONENT_ALARMS_COUNT] OF FB_TcAlarm;
+
+	// Internal variables
+	_MyVarProperty1 : BOOL;
+	_MyVarProperty2 : BOOL;
+	MyVarInternal1	: BOOL;
+	MyVarInternal2	: BOOL;
+	//MyCommandFb		: MyCommandFB;// Command FB to execute something e.g. MC_MoveAbsolute
+END_VAR
+
+VAR CONSTANT
+	MY_COMPONENT_ALARMS_COUNT : UDINT := 2;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// NO CODE HERE!!!]]></ST>
+    </Implementation>
+    <Folder Name="I_ComponentBase" Id="{2d35eaf4-cd4f-472d-ad03-604c2bbf8e6e}" />
+    <Folder Name="I_CyclicFB" Id="{ea15637a-ebab-4e95-845f-80d3edcd23ed}" />
+    <Folder Name="I_MyComponent" Id="{0486e7ae-e516-4505-9bf2-ed186636dcbf}" />
+    <Folder Name="Methods" Id="{e2fa086b-892d-45e4-85df-d38804406279}" />
+    <Folder Name="Properties" Id="{58d82187-7e2e-4009-a5a2-4aab713e037c}" />
+    <Method Name="CreateEvents" Id="{eecc47de-f316-49be-84a9-792c65c68512}" FolderPath="Methods\">
+      <Declaration><![CDATA[//! @summary Initializes event function blocks using this components's name
+{attribute 'call_after_online_change_slot' := '<slot>'}
+METHOD PROTECTED CreateEvents
+
+//! @description This method is called by <c>Initialize()</c> as required]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.CreateEvents();
+F_CreateAllEventsInClass(Alarms		:= MyComponentAlarms,
+						 ClassSize	:= SIZEOF(TC_EVENTS.MyComponentAlarms),
+						 pInitEvent := ADR(TC_EVENTS.MyComponentAlarms.InitReferenceEvent),
+						 Prefix		:= _Name);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{4d8c99c0-5c4c-4c85-abd7-3a6d7e0606f7}" FolderPath="I_CyclicFB\">
+      <Declaration><![CDATA[//! @summary This method serves as the entry point for all underlying FB logic
+METHOD PUBLIC CyclicLogic
+
+//! @description This method should be called cyclically by descendant function blocks by invoking <c>SUPER^.CyclicLogic()</c>.  Alternatively, the contents of this method could be reimplemented entirely in which case a call to this method would not be necessary.]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Initialize Component
+IF NOT _InitComplete THEN
+	_InitComplete := Initialize();
+	RETURN;
+END_IF
+
+{error 'Programming instruction - Write your custom component cyclic cogic here'}
+
+(*
+	MyCommandFb();
+	IF MyCommandFB.Error THEN
+		_Error	 := TRUE;
+		_ErrorID := MyCommandFb.ErrorId;
+	END_IF
+	
+	MyCommandFB.Execute := FALSE;
+*)
+
+// Component Error
+{error 'Programming instruction - Create component has error'}
+_Error	 := TRUE;
+_ErrorID := 9999;
+
+// Component Busy
+{error 'Programming instruction - Create component is busy'}
+IF TRUE THEN
+	_Busy := TRUE;
+ELSE
+	_Busy := FALSE;
+END_IF
+
+// Call Super
+SUPER^.CyclicLogic();
+
+// Set Current Alarm Severity
+_CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := MyComponentAlarms, CurrentSeverity := _CurrentAlarmSeverity);]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="FeedbackVar" Id="{8addcbe5-2771-45cd-afcd-b98ddd47720b}" FolderPath="I_MyComponent\">
+      <Declaration><![CDATA[PROPERTY FeedbackVar : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{fec35cb3-5baf-4ad2-8990-0eff9ebd84ba}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{914bb045-2129-4b16-8154-ab2de1c040bc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Initialize" Id="{03fd09bd-1582-4c66-9b79-0b5b3087bf7b}" FolderPath="Methods\">
+      <Declaration><![CDATA[//! @summary Basic component initialization logic
+METHOD PROTECTED Initialize : BOOL;
+
+//! @description This method is called by <c>CyclicLogic()</c> as required]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[{error 'Programming instruction - Add code to initialize your Component'}
+
+//
+
+//
+
+// Call Super after init of your Component is completed sucessfully
+
+// Call Super
+Initialize := Super^.Initialize();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Monitoring" Id="{5417dd7c-54b9-438e-9370-d86009d49109}" FolderPath="Methods\">
+      <Declaration><![CDATA[//! Provides basic error detection and event handling for this component
+METHOD PROTECTED Monitoring
+
+(*! @descriptionThis method is called cyclically by <c>CyclicLogic()</c>*)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Monitoring();
+{error 'Programming instruction - raise custom alarms here'}
+IF TRUE AND NOT MyComponentAlarms[E_MyComponentAlarms.MyExampleError].bRaised THEN
+	RaiseAlarmWithStrings(MyComponentAlarms[E_MyComponentAlarms.MyExampleError], '', '');
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MyCommand1" Id="{d1907e98-f400-41b7-bb9a-4c8c6158ae37}" FolderPath="I_MyComponent\">
+      <Declaration><![CDATA[METHOD MyCommand1 : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Component already busy -> return and not accept command
+IF _Busy THEN
+	// Trace Message Command was not accepted
+	TRACE('MyCommand1 rejected, component busy!');
+	RETURN;
+END_IF
+
+{error 'Programming instruction - Execute command here'}
+
+// Execute MyCommand1.....
+
+(*
+	MyCommandFb.Execute := TRUE;
+*)
+{error 'Programming instruction - Return command accepted in same cycle'}
+MyCommand1 := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MyCommand2" Id="{158c43f1-9759-471b-9b2c-5df5f221801f}" FolderPath="I_MyComponent\">
+      <Declaration><![CDATA[METHOD MyCommand2 : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{e57ca05e-1d1b-4272-a623-f51b9e9bbea5}" FolderPath="I_ComponentBase\">
+      <Declaration><![CDATA[//! @summary Clears error flags and error IDs for this component
+METHOD PUBLIC Reset : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[{error 'Programming instruction - Reset component here'}
+
+//
+
+//
+
+//
+
+// Clear Component Alarms
+F_ClearAllEventsInClass(MyComponentAlarms);
+
+// Call Super
+Reset := Super^.Reset();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

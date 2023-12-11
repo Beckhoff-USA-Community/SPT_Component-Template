@@ -1,0 +1,391 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Machine" Id="{d5c1a520-7f34-4388-b108-926928c14741}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Machine EXTENDS FB_PackML_BaseModule
+VAR
+	(*List of Components*)
+	MyComponent : FB_Component_MyComponent := (Name := 'My Component');
+
+	(*Alarms for this module*)
+	MachineAlarms : ARRAY[1..MACHINE_ALARM_COUNT] OF FB_TcAlarm;
+END_VAR
+
+VAR CONSTANT
+	//Alarm count constant
+	MACHINE_ALARM_COUNT : INT := 1; //Change this value based on how many alarms are in your machine
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="I_CyclicFB" Id="{c2b7af95-c402-4115-b5e6-e32c5abd7442}" />
+    <Folder Name="Methods" Id="{9b31e10f-2f7d-47d0-8b03-ede4de2288d4}">
+      <Folder Name="Acting States" Id="{4852ed8f-2499-410b-a324-a30452567bd3}" />
+      <Folder Name="HMI" Id="{2790fade-5dfc-4738-ae5f-b9a7fc939b52}" />
+      <Folder Name="Waiting States" Id="{e66a6a2f-4562-4f2c-b64d-d3242d14ce67}" />
+    </Folder>
+    <Folder Name="Properties" Id="{4933d93e-36ab-4bbd-978d-c1e32a9c74be}" />
+    <Method Name="Aborting" Id="{178367ee-dd78-4a48-87ef-4a4b7e8228eb}" FolderPath="Methods\Acting States\">
+      <Declaration><![CDATA[METHOD PROTECTED Aborting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+	E_PMLUnitMode.ePMLUnitMode_Production, E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+		CASE SequenceState OF
+			0:
+				SUPER^.Aborting();
+		END_CASE
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Clearing" Id="{2d7bd44a-83d3-4f12-b430-8d251f957fa7}" FolderPath="Methods\Acting States\">
+      <Declaration><![CDATA[METHOD PROTECTED Clearing
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		SUPER^.Clearing();
+
+	//=================================MAINTENANCE MODE==================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+		SUPER^.Clearing();
+
+	//=================================MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Manual:
+		SUPER^.Clearing();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ComponentMonitor" Id="{3156856d-5730-4866-8ae6-303e68935e7b}" FolderPath="Methods\">
+      <Declaration><![CDATA[//! @summary This method monitors <b>components</b> within this PackML module and initiates fault responses as required
+METHOD PROTECTED ComponentMonitor : BOOL
+VAR
+	AlarmResponses : ARRAY[0..4] OF E_AlarmResponse; //Temporary response array
+	i			   : UDINT;
+END_VAR
+
+//! @description This method is called cyclically by <c>CyclicLogic()</c>]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Super^.ComponentMonitor();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateEvents" Id="{3ef7297b-dc6e-4a47-8d8e-332da0b8eab2}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PROTECTED CreateEvents
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Add your event creation here
+F_CreateAllEventsInClass(Alarms		:= MachineAlarms,
+						 ClassSize	:= SIZEOF(TC_Events.Machine),
+						 pInitEvent := ADR(TC_EVENTS.Machine.InitReferenceEvent),
+						 Prefix		:= Name);
+
+// Super call to base
+SUPER^.CreateEvents();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{3a2f2751-120e-49d4-84e7-dd5883d6841e}" FolderPath="I_CyclicFB\">
+      <Declaration><![CDATA[METHOD CyclicLogic
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT _InitComplete THEN
+	_InitComplete := Initialize();
+	RETURN;
+END_IF
+
+(* Inhibit Cylinder Movmements *)
+
+(* Call Super *)
+SUPER^.CyclicLogic();
+CyclicLogic_Monitoring();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic_Monitoring" Id="{4c908086-d643-07f9-26f6-7ebf2812f789}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PROTECTED CyclicLogic_Monitoring
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(*	
+Monitor machine alarms here
+*)
+
+(*IF EstopInput1 AND NOT MachineAlarms[E_PLC1.EmergencyStop1].bRaised THEN
+    RaiseAlarmWithStrings(MachineAlarms[E_PLC1.EmergencyStop1], '', '');
+ELSIF NOT EstopInput1 AND MachineAlarms[E_PLC1.EmergencyStop1].bRaised THEN
+    MachineAlarms[E_PLC1.EmergencyStop1].Clear(0, 0);
+END_IF*) ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Execute" Id="{40f4ed16-35d2-49f8-82df-359513a75151}" FolderPath="Methods\Waiting States\">
+      <Declaration><![CDATA[METHOD PROTECTED FINAL Execute]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		CASE SequenceState OF
+			0:
+		END_CASE
+
+	//=================================MAINTENANCE MODE==================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+
+	//=================================MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Manual:
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMIPermissions" Id="{01f1aea6-e802-48f8-abd4-50a2a3d31fba}" FolderPath="Methods\HMI\">
+      <Declaration><![CDATA[METHOD PROTECTED HMIPermissions
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		AllowHMIControl(ThisModuleOnly := TRUE);
+
+	//=================================MAINTENANCE MODE==================================	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+		AllowHMIControl(ThisModuleOnly := FALSE);
+
+	//=================================MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Manual:
+		AllowHMIControl(ThisModuleOnly := FALSE);
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{c8e5bfb3-7a5f-4315-8e43-29ab3e5bd8c9}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PROTECTED Initialize : BOOL
+VAR
+	i : UDINT; //Generic iteration value
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Initialize := FALSE;
+CASE DescendantSequenceState OF
+	0:
+		//RegisterComponent(Servo);
+		_LogModeChanges			:= FALSE;
+		_LogStateChanges		:= FALSE;
+		DescendantSequenceState := DescendantSequenceState + 10;
+
+	10:
+		//Setup Custom modes here
+		CustomModes(eMode						   := E_PMLUnitMode.ePMLUnitMode_Production,
+					sName						   := 'Production',
+					bDisableClearing			   := FALSE,
+					bDisableStarting			   := FALSE,
+					bDisableSuspended			   := TRUE,
+					bDisableStopping			   := FALSE,
+					bDisableAborting			   := FALSE,
+					bDisableHolding				   := TRUE,
+					bDisableHeld				   := TRUE,
+					bDisableUnholding			   := TRUE,
+					bDisableSuspending			   := TRUE,
+					bDisableUnsuspending		   := TRUE,
+					bDisableResetting			   := TRUE,
+					bDisableIdle				   := TRUE,
+					bDisableCompleting			   := TRUE,
+					bDisableComplete			   := TRUE,
+					bEnableUnitModeChangeStopped   := TRUE,
+					bEnableUnitModeChangeIdle	   := TRUE,
+					bEnableUnitModeChangeSuspended := FALSE,
+					bEnableUnitModeChangeExecute   := FALSE,
+					bEnableUnitModeChangeAborted   := TRUE,
+					bEnableUnitModeChangeHeld	   := FALSE,
+					bEnableUnitModeChangeComplete  := TRUE,
+					bError						   =>,
+					nErrorId					   =>);
+
+		CustomModes(eMode						   := E_PMLUnitMode.ePMLUnitMode_Manual,
+					sName						   := 'Manual',
+					bDisableClearing			   := FALSE,
+					bDisableStarting			   := FALSE,
+					bDisableSuspended			   := TRUE,
+					bDisableStopping			   := FALSE,
+					bDisableAborting			   := FALSE,
+					bDisableHolding				   := TRUE,
+					bDisableHeld				   := TRUE,
+					bDisableUnholding			   := TRUE,
+					bDisableSuspending			   := TRUE,
+					bDisableUnsuspending		   := TRUE,
+					bDisableResetting			   := TRUE,
+					bDisableIdle				   := TRUE,
+					bDisableCompleting			   := TRUE,
+					bDisableComplete			   := TRUE,
+					bEnableUnitModeChangeStopped   := TRUE,
+					bEnableUnitModeChangeIdle	   := TRUE,
+					bEnableUnitModeChangeSuspended := TRUE,
+					bEnableUnitModeChangeExecute   := TRUE,
+					bEnableUnitModeChangeAborted   := TRUE,
+					bEnableUnitModeChangeHeld	   := TRUE,
+					bEnableUnitModeChangeComplete  := TRUE,
+					bError						   =>,
+					nErrorId					   =>);
+
+		CustomModes(eMode						   := E_PMLUnitMode.ePMLUnitMode_Maintenance,
+					sName						   := 'Maintenance',
+					bDisableClearing			   := FALSE,
+					bDisableStarting			   := FALSE,
+					bDisableSuspended			   := TRUE,
+					bDisableStopping			   := FALSE,
+					bDisableAborting			   := FALSE,
+					bDisableHolding				   := TRUE,
+					bDisableHeld				   := TRUE,
+					bDisableUnholding			   := TRUE,
+					bDisableSuspending			   := TRUE,
+					bDisableUnsuspending		   := TRUE,
+					bDisableResetting			   := TRUE,
+					bDisableIdle				   := TRUE,
+					bDisableCompleting			   := TRUE,
+					bDisableComplete			   := TRUE,
+					bEnableUnitModeChangeStopped   := TRUE,
+					bEnableUnitModeChangeIdle	   := TRUE,
+					bEnableUnitModeChangeSuspended := TRUE,
+					bEnableUnitModeChangeExecute   := TRUE,
+					bEnableUnitModeChangeAborted   := TRUE,
+					bEnableUnitModeChangeHeld	   := TRUE,
+					bEnableUnitModeChangeComplete  := TRUE,
+					bError						   =>,
+					nErrorId					   =>);
+
+		DescendantSequenceState := DescendantSequenceState + 10;
+
+	20:
+		//Copy Mode names
+		FOR i := 1 TO 3 DO
+			ModeNames[i] := F_UnitModeToString(UDINT_TO_DINT(i));
+		END_FOR
+
+		DescendantSequenceState := DescendantSequenceState + 10;
+
+	30:
+		// Initialize Recipes 
+		DescendantSequenceState := DescendantSequenceState + 10;
+
+	40:
+		//Call the Super
+		IF SUPER^.Initialize() THEN
+			DescendantSequenceState := DescendantSequenceState + 10;
+		END_IF
+
+	50:
+		Initialize := TRUE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Starting" Id="{6ab16cab-cb5f-4b0f-8213-50dd8c79b60e}" FolderPath="Methods\Acting States\">
+      <Declaration><![CDATA[METHOD PROTECTED Starting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+	E_PMLUnitMode.ePMLUnitMode_Production, E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+		CASE SequenceState OF
+			0:
+				SUPER^.Starting();
+		END_CASE
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stopping" Id="{b16c4d90-e898-4417-b137-a20fc72956d1}" FolderPath="Methods\Acting States\">
+      <Declaration><![CDATA[//! @summary This method contains code which will execute when this PackML module is in the <b>Stopping</b> state
+METHOD PROTECTED Stopping
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+(*! <description><b></b><table> 
+	<tr>
+		<th> Previous State </th>
+		<th> Transition In </th>
+		<th> Transition Out </th>
+		<th> Next State  </th> 
+	</tr>
+	<tr>
+		<td> <b>ANY<i>except</i></b>Stopped<b>-or-</b>Clearing<b>-or-</b>Aborted<b>-or-</b>Aborting</td>
+		<td> Stop Command </td> 
+		<td> State Complete </td>
+		<td> Stopped </td> 
+	</tr>
+</table>
+This method is called as required by <c>StateControl()</c>
+</description> 
+
+*)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+	E_PMLUnitMode.ePMLUnitMode_Production, E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+		CASE SequenceState OF
+			0:
+				SUPER^.Stopping();
+		END_CASE
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SubModuleMonitor" Id="{dcbc78eb-4598-4276-aefb-1642881bb3aa}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PROTECTED SubModuleMonitor : BOOL
+VAR
+	AlarmResponses : ARRAY[0..4] OF E_AlarmResponse; //Temporary response array	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Check the sub Modules for Alarm Severity
+SUPER^.SubModuleMonitor();
+
+//Check the alarms at the machine level
+_CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := MachineAlarms, CurrentSeverity := _CurrentAlarmSeverity);
+
+//Check the severity of the machine level alarms
+IF _CurrentState <> E_PMLState.ePMLState_Aborted AND _CurrentState <> E_PMLState.ePMLState_Aborting AND _CurrentState <> E_PMLState.ePMLState_Clearing AND _CurrentState <> E_PMLState.ePMLState_Stopped AND _CurrentState <> E_PMLState.ePMLState_Stopping THEN
+	AlarmResponses := _ParentFaultResponseDefinitions;
+	CASE AlarmResponses[CurrentAlarmSeverity] OF
+		E_AlarmResponse.Abort_ImmediateError:
+			AbortImmediateError(Name, TRUE);
+
+		E_AlarmResponse.Abort_Immediate:
+			AbortImmediate();
+
+		E_AlarmResponse.Stop_Immediate:
+			StopImmediate();
+
+		E_AlarmResponse.Stop_Controlled:
+			StopControlled();
+
+		E_AlarmResponse.Hold_Immediate:
+			HoldImmediate();
+
+		E_AlarmResponse.Suspend_Immediate:
+			SuspendImmediate();
+
+		E_AlarmResponse.Suspend_Controlled:
+			SuspendControlled();
+
+		E_AlarmResponse.NoResponse:
+			;
+	END_CASE
+ELSIF _CurrentState = E_PMLState.ePMLState_Stopped OR _CurrentState = E_PMLState.ePMLState_Stopping THEN
+	AlarmResponses := _ParentFaultResponseDefinitions;
+	CASE AlarmResponses[CurrentAlarmSeverity] OF
+		E_AlarmResponse.Abort_ImmediateError:
+			AbortImmediateError(Name, TRUE);
+
+		E_AlarmResponse.Abort_Immediate:
+			AbortImmediate();
+
+		E_AlarmResponse.NoResponse:
+			;
+	END_CASE
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

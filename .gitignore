@@ -12,6 +12,9 @@
 *.~
 *.project.~u
 *.tclrs
+*.tmc
+!MyComponent.tmc
+!Machine.tmc
 *.tmcRefac
 *.xti.bak
 LineIDs.dbg

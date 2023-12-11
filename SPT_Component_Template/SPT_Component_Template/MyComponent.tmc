@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<TcModuleClass>
+	<Translations>
+		<Text TxtId="MyComponentAlarms_InitReferenceEvent_DisplayText">
+			<Text LcId="1033"><![CDATA[{0} - Init Event]]></Text>
+		</Text>
+		<Text TxtId="MyComponentAlarms_MyExampleError_DisplayText">
+			<Text LcId="1033"><![CDATA[{0} - Example Errror!]]></Text>
+		</Text>
+	</Translations>
+	<DataTypes>
+		<DataType>
+			<Name GUID="{D25F2E5C-9953-4B85-B404-9EB82532F012}">MyComponentAlarms</Name>
+			<DisplayName TxtId=""><![CDATA[EventClass1_DisplayText]]></DisplayName>
+			<EventId>
+				<Name Id="1">InitReferenceEvent</Name>
+				<DisplayName TxtId=""><![CDATA[MyComponentAlarms_InitReferenceEvent_DisplayText]]></DisplayName>
+				<Severity>Info</Severity>
+			</EventId>
+			<EventId>
+				<Name Id="2">MyExampleError</Name>
+				<DisplayName TxtId=""><![CDATA[MyComponentAlarms_MyExampleError_DisplayText]]></DisplayName>
+				<Severity>Error</Severity>
+			</EventId>
+			<Hides>
+				<Hide GUID="{D47A1BBF-8151-48D8-8BA5-AB40259EA0E6}"/>
+				<Hide GUID="{5EFBE3E1-D608-4537-8AC1-D9BF7C53C0EB}"/>
+				<Hide GUID="{117D871B-04D7-47E7-940A-E78AF21C44E0}"/>
+				<Hide GUID="{BB78F74A-2280-4968-906A-FD63FA954D8D}"/>
+				<Hide GUID="{8BB33EE6-1542-41A3-BCC2-F15D77EF225C}"/>
+				<Hide GUID="{8AEBEC33-7DC3-43D4-BE80-9C6CF78B0E5A}"/>
+				<Hide GUID="{F1864FDC-559E-4E97-A3FA-B522103A8724}"/>
+			</Hides>
+		</DataType>
+	</DataTypes>
+</TcModuleClass>

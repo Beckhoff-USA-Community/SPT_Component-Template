@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{f5be6099-6b61-4d94-a8d9-c23081d561a8}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	Machine		 : FB_Machine := (Name := 'Machine');
+	InitComplete : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT InitComplete THEN
+	InitComplete := Initialize();
+	RETURN;
+END_IF
+
+//Machine Cyclic Logic
+Machine.CyclicLogic();]]></ST>
+    </Implementation>
+    <Method Name="Initialize" Id="{ab59481b-99a0-4d4e-a6a3-d8accde04322}">
+      <Declaration><![CDATA[METHOD Initialize : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Initialize := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
