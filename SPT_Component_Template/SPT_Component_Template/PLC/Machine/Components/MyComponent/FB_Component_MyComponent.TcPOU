@@ -12,7 +12,8 @@ VAR
 	MyOutput AT %Q* : BOOL;
 
 	// HMI
-	MyComponent_HMI : ST_ComponentMyComponent_HMI;
+	MyComponent_HMI			: ST_ComponentMyComponent_HMI;
+	HMICommandDescendant_RT : R_TRIG;
 
 	// Alarms
 	MyComponentAlarms : ARRAY[1..MY_COMPONENT_ALARMS_COUNT] OF FB_TcAlarm;
@@ -22,6 +23,7 @@ VAR
 	_MyVarProperty2 : BOOL;
 	MyVarInternal1	: BOOL;
 	MyVarInternal2	: BOOL;
+
 	//MyCommandFb		: MyCommandFB;// Command FB to execute something e.g. MC_MoveAbsolute
 END_VAR
 
@@ -29,7 +31,7 @@ VAR CONSTANT
 	MY_COMPONENT_ALARMS_COUNT : UDINT := 2;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// NO CODE HERE!!!]]></ST>
+      <ST><![CDATA[// NO CODE HERE!!! ]]></ST>
     </Implementation>
     <Folder Name="I_ComponentBase" Id="{2d35eaf4-cd4f-472d-ad03-604c2bbf8e6e}" />
     <Folder Name="I_CyclicFB" Id="{ea15637a-ebab-4e95-845f-80d3edcd23ed}" />
@@ -101,10 +103,26 @@ METHOD PROTECTED HMICommunication
 //! @description This method is called cyclically by <c>CyclicLogic()</c>]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.HMICommunication();
+{error 'Programming instruction - Add HMI communication'}
 
-// Command
+//Process HMI requests
+HMICommandDescendant_RT(CLK := (ComponentBase_HMI.Status.HMIControlAvailable AND NOT HMICommandActive_Base) AND (MyComponent_HMI.Command.MyCommand1 XOR MyComponent_HMI.Command.MyCommand2));
 
-// Status]]></ST>
+//Base components should observe this to interlock HMI commands
+HMICommandActive_Descendant := ComponentBase_HMI.Status.HMIControlAvailable AND (MyComponent_HMI.Command.MyCommand1 OR MyComponent_HMI.Command.MyCommand2);
+IF HMICommandDescendant_RT.Q THEN
+	IF MyComponent_HMI.Command.MyCommand1 THEN
+		MyCommand1();
+	END_IF
+
+	IF MyComponent_HMI.Command.MyCommand2 THEN
+		MyCommand2();
+	END_IF
+END_IF
+
+//Update HMI status info
+MyComponent_HMI.Status.MyVarProperty1 := _MyVarProperty1;
+MyComponent_HMI.Status.MyVarProperty2 := _MyVarProperty2;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{03fd09bd-1582-4c66-9b79-0b5b3087bf7b}" FolderPath="Methods\">
@@ -139,8 +157,7 @@ END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="MyCommand1" Id="{d1907e98-f400-41b7-bb9a-4c8c6158ae37}" FolderPath="I_MyComponent\">
-      <Declaration><![CDATA[METHOD MyCommand1 : BOOL
-]]></Declaration>
+      <Declaration><![CDATA[METHOD MyCommand1 : BOOL]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Component already busy -> return and not accept command
 IF _Busy THEN
@@ -161,27 +178,23 @@ MyCommand1 := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="MyCommand2" Id="{158c43f1-9759-471b-9b2c-5df5f221801f}" FolderPath="I_MyComponent\">
-      <Declaration><![CDATA[METHOD MyCommand2 : BOOL
-]]></Declaration>
+      <Declaration><![CDATA[METHOD MyCommand2 : BOOL]]></Declaration>
       <Implementation>
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Property Name="MyVarProperty1" Id="{8addcbe5-2771-45cd-afcd-b98ddd47720b}" FolderPath="I_MyComponent\">
-      <Declaration><![CDATA[PROPERTY MyVarProperty1 : BOOL
-]]></Declaration>
+      <Declaration><![CDATA[PROPERTY MyVarProperty1 : BOOL]]></Declaration>
       <Get Name="Get" Id="{fec35cb3-5baf-4ad2-8990-0eff9ebd84ba}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[MyVarProperty1 := _MyVarProperty1;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{914bb045-2129-4b16-8154-ab2de1c040bc}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[_MyVarProperty1 := MyVarProperty1;]]></ST>
         </Implementation>
@@ -191,16 +204,14 @@ END_VAR
       <Declaration><![CDATA[PROPERTY MyVarProperty2 : BOOL]]></Declaration>
       <Get Name="Get" Id="{3842b905-26dd-4a6e-bd95-bade362be1a7}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[MyVarProperty2 := _MyVarProperty2;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{45c1d1cd-1b65-4c46-8411-d159cae69c21}">
         <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
+END_VAR]]></Declaration>
         <Implementation>
           <ST><![CDATA[_MyVarProperty2 := MyVarProperty2;]]></ST>
         </Implementation>
