@@ -4,7 +4,7 @@ This sample is created by [Beckhoff Automation LLC.](https://www.beckhoff.com/en
 # Documentation
 Please visit our [documentation page](https://beckhoff-usa-community.github.io/SPT-Libraries/) for detailed information on the contents of the framework as well as thoughts on architecture of machine programs.
 
-On How to Write a Component Documentation please visit the following page [documentation page](https://beckhoff-usa-community.github.io/SPT-Libraries/)
+On How to Write a Component Documentation please visit the following page [documentation page](https://beckhoff-usa-community.github.io/SPT-Libraries/SPT_Components/ComponentGuide.html)
 
 ## How to get support
 For SPT framework support, raise an [issue](https://github.com/Beckhoff-USA-Community/SPT-Libraries/issues/new/choose) here.
